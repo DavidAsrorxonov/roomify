@@ -10,6 +10,12 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import type { AuthState } from "types/auth-state";
+import React from "react";
+import {
+  getCurrentUser,
+  signIn as puterSignIn,
+  signOut as puterSignOut,
+} from "lib/puter.action";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -49,6 +55,41 @@ const DEFAULT_AUTH_STATE: AuthState = {
 };
 
 export default function App() {
+  const [authState, setAuthState] =
+    React.useState<AuthState>(DEFAULT_AUTH_STATE);
+
+  const refreshAuth = async () => {
+    try {
+      const user = await getCurrentUser();
+
+      setAuthState({
+        isSignedIn: !!user,
+        userName: user?.username || null,
+        userId: user?.uuid || null,
+      });
+
+      return !!user;
+    } catch (error) {
+      setAuthState(DEFAULT_AUTH_STATE);
+      console.log(error);
+      return false;
+    }
+  };
+
+  React.useEffect(() => {
+    refreshAuth();
+  }, []);
+
+  const signIn = async () => {
+    await puterSignIn();
+    return await refreshAuth();
+  };
+
+  const signOut = async () => {
+    puterSignOut();
+    return await refreshAuth();
+  };
+
   return <Outlet />;
 }
 
