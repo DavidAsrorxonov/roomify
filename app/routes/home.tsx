@@ -1,6 +1,6 @@
 import Navbar from "components/navbar";
 import type { Route } from "./+types/home";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Layers } from "lucide-react";
 import { Button } from "components/ui/button";
 
 export function meta({}: Route.MetaArgs) {
@@ -38,6 +38,22 @@ export default function Home() {
           <Button variant="outline" size="lg" className="demo">
             Watch Demo
           </Button>
+        </div>
+
+        <div id="upload" className="upload-shell">
+          <div className="grid-overlay" />
+          <div className="upload-card">
+            <div className="upload-head">
+              <div className="upload-icon">
+                <Layers className="icon" />
+              </div>
+
+              <h3>Upload your floor plan</h3>
+              <p>Supports JPG, PNG, formats up to 10MB</p>
+            </div>
+
+            <p>Upload images</p>
+          </div>
         </div>
       </section>
     </div>
