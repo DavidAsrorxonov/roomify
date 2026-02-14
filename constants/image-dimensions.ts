@@ -1,0 +1,1 @@
+export const IMAGE_RENDER_DIMENSION = 1024;

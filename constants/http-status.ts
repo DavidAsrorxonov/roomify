@@ -1,0 +1,1 @@
+export const UNAUTHORIZED_STATUSES = [401, 403];
