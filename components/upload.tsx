@@ -28,6 +28,11 @@ const Upload = ({ onComplete }: UploadProps) => {
 
     const reader = new FileReader();
 
+    reader.onerror = () => {
+      setFile(null);
+      setProgress(0);
+    };
+
     reader.onload = (event) => {
       const base64String = event.target?.result as string;
 
@@ -91,7 +96,8 @@ const Upload = ({ onComplete }: UploadProps) => {
     if (!isSignedIn) return;
 
     const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile && ["image/jpeg", "image/png"].includes(droppedFile.type)) {
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (droppedFile && allowedTypes.includes(droppedFile.type)) {
       processFile(droppedFile);
     }
   };
