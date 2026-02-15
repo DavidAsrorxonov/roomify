@@ -52,4 +52,14 @@ export const generate3DView = async ({ sourceImage }: Generate3DViewParams) => {
     input_image_mime_type: mimeType,
     ratio: { w: 124, h: 124 },
   });
+
+  const rawImgUrl = (response as HTMLImageElement).src ?? null;
+
+  if (!rawImgUrl) return { renderedImage: null, renderedPath: undefined };
+
+  const renderedImage = rawImgUrl.startsWith("data:")
+    ? rawImgUrl
+    : await fetchAsDataUrl(rawImgUrl);
+
+  return { renderedImage, renderedPath: undefined };
 };
