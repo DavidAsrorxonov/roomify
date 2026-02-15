@@ -104,3 +104,17 @@ export const getImageExtension = (contentType: string, url: string): string => {
 
   return "png";
 };
+
+const normalizeHost = (subdomain: string) =>
+  subdomain.endsWith(HOSTING_DOMAIN_SUFFIX)
+    ? subdomain
+    : `${subdomain}${HOSTING_DOMAIN_SUFFIX}`;
+
+export const getHostedUrl = (
+  hosting: { subdomain: string },
+  filePath: string,
+): string | null => {
+  if (!hosting?.subdomain) return null;
+  const host = normalizeHost(hosting.subdomain);
+  return `https://${host}/${filePath}`;
+};

@@ -4,6 +4,7 @@ import type { StoreHostedImageParams } from "types/store-hosted-image-params";
 import {
   createHostingSlug,
   fetchBlobFromUrl,
+  getHostedUrl,
   getImageExtension,
   HOSTING_CONFIG_KEY,
   imageUrlToPngBlob,
@@ -52,6 +53,19 @@ export const uploadImageToHosting = async ({
 
     const contentType = resolved.contentType || resolved.blob.type || "";
     const ext = getImageExtension(contentType, url);
+    const dir = `projects/${projectId}`;
+    const filePath = `${dir}/${label}.${ext}`;
+
+    const uploadFile = new File([resolved.blob], `${label}.${ext}`, {
+      type: contentType,
+    });
+
+    await puter.fs.mkdir(dir, { createMissingParents: true });
+    await puter.fs.write(filePath, uploadFile);
+
+    const hostedUrl = getHostedUrl({ subdomain: hosting.subdomain }, filePath);
+
+    return hostedUrl ? { url: hostedUrl } : null;
   } catch (error) {
     console.warn(`Could not find hosting URL: ${error}`);
     return null;
