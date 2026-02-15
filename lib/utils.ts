@@ -80,3 +80,27 @@ export const fetchBlobFromUrl = async (
     return null;
   }
 };
+
+export const getImageExtension = (contentType: string, url: string): string => {
+  const type = (contentType || "").toLowerCase();
+  const typeMatch = type.match(/image\/(png|jpe?g|webp|gif|svg\+xml|svg)/);
+  if (typeMatch?.[1]) {
+    const ext = typeMatch[1].toLowerCase();
+    return ext === "jpeg" || ext === "jpg"
+      ? "jpg"
+      : ext === "svg+xml"
+        ? "svg"
+        : ext;
+  }
+
+  const dataMatch = url.match(/^data:image\/([a-z0-9+.-]+);/i);
+  if (dataMatch?.[1]) {
+    const ext = dataMatch[1].toLowerCase();
+    return ext === "jpeg" ? "jpg" : ext;
+  }
+
+  const extMatch = url.match(/\.([a-z0-9]+)(?:$|[?#])/i);
+  if (extMatch?.[1]) return extMatch[1].toLowerCase();
+
+  return "png";
+};

@@ -4,6 +4,7 @@ import type { StoreHostedImageParams } from "types/store-hosted-image-params";
 import {
   createHostingSlug,
   fetchBlobFromUrl,
+  getImageExtension,
   HOSTING_CONFIG_KEY,
   imageUrlToPngBlob,
   isHostedUrl,
@@ -48,6 +49,9 @@ export const uploadImageToHosting = async ({
         : await fetchBlobFromUrl(url);
 
     if (!resolved) return null;
+
+    const contentType = resolved.contentType || resolved.blob.type || "";
+    const ext = getImageExtension(contentType, url);
   } catch (error) {
     console.warn(`Could not find hosting URL: ${error}`);
     return null;
