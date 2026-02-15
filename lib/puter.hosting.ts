@@ -1,6 +1,14 @@
 import puter from "@heyputer/puter.js";
 import type { HostingConfig } from "types/hosting-config";
-import { createHostingSlug, HOSTING_CONFIG_KEY } from "./utils";
+import type { StoreHostedImageParams } from "types/store-hosted-image-params";
+import {
+  createHostingSlug,
+  fetchBlobFromUrl,
+  HOSTING_CONFIG_KEY,
+  imageUrlToPngBlob,
+  isHostedUrl,
+} from "./utils";
+import type { HostedAsset } from "types/hosted-asset";
 
 export const getOrCreateHostingConfig =
   async (): Promise<HostingConfig | null> => {
@@ -15,11 +23,33 @@ export const getOrCreateHostingConfig =
     try {
       const created = await puter.hosting.create(subdomain, ".");
 
-      const record = { subdomain: created.subdomain };
-
-      return record;
+      return { subdomain: created.subdomain };
     } catch (error) {
       console.warn(`Could not find subdomain: ${error}`);
       return null;
     }
   };
+
+export const uploadImageToHosting = async ({
+  hosting,
+  url,
+  projectId,
+  label,
+}: StoreHostedImageParams): Promise<HostedAsset | null> => {
+  if (!hosting || !url) return null;
+  if (isHostedUrl(url)) return { url };
+
+  try {
+    const resolved =
+      label === "rendered"
+        ? await imageUrlToPngBlob(url).then((blob) =>
+            blob ? { blob, contentType: "image/png" } : null,
+          )
+        : await fetchBlobFromUrl(url);
+
+    if (!resolved) return null;
+  } catch (error) {
+    console.warn(`Could not find hosting URL: ${error}`);
+    return null;
+  }
+};
