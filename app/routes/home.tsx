@@ -10,7 +10,7 @@ import { createProject } from "lib/puter.action";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
+    { title: "Roomify" },
     { name: "description", content: "Welcome to React Router!" },
   ];
 }
@@ -109,34 +109,35 @@ export default function Home() {
           </div>
 
           <div className="projects-grid">
-            <div className="project-card group">
-              <div className="preview">
-                <img
-                  src="https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png"
-                  alt="project"
-                />
+            {projects.map(
+              ({ id, name, renderedImage, sourceImage, timestamp }) => (
+                <div className="project-card group">
+                  <div className="preview">
+                    <img src={renderedImage || sourceImage} alt="Project" />
 
-                <div className="badge">
-                  <span>Community</span>
-                </div>
-              </div>
+                    <div className="badge">
+                      <span>Community</span>
+                    </div>
+                  </div>
 
-              <div className="card-body">
-                <div>
-                  <h3>Project Manhattan</h3>
+                  <div className="card-body">
+                    <div>
+                      <h3>{name}</h3>
 
-                  <div className="meta">
-                    <Clock size={12} />
-                    <span>{new Date("2027-01-01").toLocaleDateString()}</span>
-                    <span>By Dave0211</span>
+                      <div className="meta">
+                        <Clock size={12} />
+                        <span>{new Date(timestamp).toLocaleDateString()}</span>
+                        <span>By Dave0211</span>
+                      </div>
+                    </div>
+
+                    <div className="arrow">
+                      <ArrowUpRight size={18} />
+                    </div>
                   </div>
                 </div>
-
-                <div className="arrow">
-                  <ArrowUpRight size={18} />
-                </div>
-              </div>
-            </div>
+              ),
+            )}
           </div>
         </div>
       </section>
