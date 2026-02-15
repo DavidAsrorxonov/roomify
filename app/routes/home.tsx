@@ -4,6 +4,9 @@ import { ArrowRight, ArrowUpRight, Clock, Layers } from "lucide-react";
 import { Button } from "components/ui/button";
 import Upload from "components/upload";
 import { useNavigate } from "react-router";
+import type { DesignItem } from "types/design-item";
+import React from "react";
+import { createProject } from "lib/puter.action";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -14,11 +17,36 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Home() {
   const navigate = useNavigate();
+  const [projects, setProjects] = React.useState<DesignItem[]>([]);
 
   const handleUploadComplete = async (base64Image: string) => {
     const newId = Date.now().toString();
+    const name = `Residence ${newId}`;
 
-    navigate(`/visualizer/${newId}`);
+    const newItem = {
+      id: newId,
+      name,
+      sourceImage: base64Image,
+      renderedImage: undefined,
+      timestamp: Date.now(),
+    };
+
+    const saved = await createProject({ item: newItem, visibility: "private" });
+
+    if (!saved) {
+      console.error(`Failed to create project ${newId}`);
+      return false;
+    }
+
+    setProjects((prev) => [newItem, ...prev]);
+
+    navigate(`/visualizer/${newId}`, {
+      state: {
+        initialImage: saved.sourceImage,
+        initialRender: saved.renderedImage || null,
+        name,
+      },
+    });
 
     return true;
   };
