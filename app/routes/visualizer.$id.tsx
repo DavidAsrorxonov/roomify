@@ -104,7 +104,7 @@ const VisualizerId = () => {
               <div className="render-overlay">
                 <div className="rendering-card">
                   <RefreshCcw className="spinner" />
-                  <span className="titl">Rendering...</span>
+                  <span className="title">Rendering...</span>
                   <span className="subtitle">
                     Generating your 3D visualization...
                   </span>

@@ -50,7 +50,7 @@ export const generate3DView = async ({ sourceImage }: Generate3DViewParams) => {
     model: "gemini-2.5-flash-image-preview",
     input_image: base64,
     input_image_mime_type: mimeType,
-    ratio: { w: 124, h: 124 },
+    ratio: { w: 1024, h: 1024 },
   });
 
   const rawImgUrl = (response as HTMLImageElement).src ?? null;
