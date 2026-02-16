@@ -26,7 +26,13 @@ export const getCurrentUser = async () => {
 
 export const createProject = async ({
   item,
+  visibility = "private",
 }: CreateProjectParams): Promise<DesignItem | null | undefined> => {
+  if (!PUTER_WORKER_URL) {
+    console.error("PUTER_WORKER_URL is not defined");
+    return null;
+  }
+
   const projectId = item.id;
 
   const hosting = await getOrCreateHostingConfig();
@@ -79,8 +85,23 @@ export const createProject = async ({
   };
 
   try {
-    // implement saving to KV later
-    return payload;
+    const response = await puter.workers.exec(
+      `${PUTER_WORKER_URL}/api/projects/save`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ project: payload, visibility }),
+      },
+    );
+
+    if (!response.ok) {
+      console.error(`Failed to save project`, await response.text());
+      return null;
+    }
+
+    const data = (await response.json()) as { project?: DesignItem | null };
+
+    return data?.project ?? null;
   } catch (error) {
     console.log(`Failed to save project: ${error}`);
     return null;
@@ -112,5 +133,41 @@ export const getProjects = async () => {
   } catch (error) {
     console.error(`Failed to get projects: ${error}`);
     return [];
+  }
+};
+
+export const getProjectById = async ({ id }: { id: string }) => {
+  if (!PUTER_WORKER_URL) {
+    console.error("PUTER_WORKER_URL is not defined");
+    return null;
+  }
+
+  console.log(`Fetching project by id: ${id}`);
+
+  try {
+    const response = await puter.workers.exec(
+      `${PUTER_WORKER_URL}/api/projects/get?id=${encodeURIComponent(id)}`,
+      {
+        method: "GET",
+      },
+    );
+
+    console.log("Fetch project response:", response);
+
+    if (!response.ok) {
+      console.error("Failed to fetch project:", await response.text());
+      return null;
+    }
+
+    const data = (await response.json()) as {
+      project?: DesignItem | null;
+    };
+
+    console.log("Fetched project data:", data);
+
+    return data?.project ?? null;
+  } catch (error) {
+    console.error("Failed to fetch project:", error);
+    return null;
   }
 };
